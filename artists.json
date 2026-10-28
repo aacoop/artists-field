@@ -1,7 +1,9 @@
 {
- "title": "artists field",
- "about": "A shared list of artists. Each one keeps their own site here and edits it in the browser.",
+ "title": "aacoop ++",
+ "about": "aacoop is a cooperative of artists, architects, programmers and 3D people. We share tools, spaces and projects.",
+ "tags": ["3D", "architecture", "art posts", "code", "art", "collectives"],
  "artists": [
-  { "slug": "alexandra-konstantinovna", "name": "alexandra konstantinovna", "line": "imaginary engineering: VR, glass, steel, ceramics, set design", "cover": "a/alexandra-konstantinovna/img/01/01.jpg" }
- ]
+  { "slug": "alexandra-konstantinovna", "name": "alexandra konstantinovna", "line": "imaginary engineering: VR, glass, steel, ceramics, set design", "cover": "a/alexandra-konstantinovna/img/01/01.jpg", "tags": ["art", "3D", "code"] }
+ ],
+ "projects": []
 }
