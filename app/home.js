@@ -1,6 +1,6 @@
 /* PLUG home: people / projects / about, tag ball pit, strict card grid, editor behind "login". */
 (function () {
-  var L = null, saved = "", edit = false, view = "people", tag = null, PENDING = {}, pit = null;
+  var L = null, saved = "", edit = false, view = "projects", tag = null, PENDING = {}, pit = null, WORKS = [];
   var main = document.getElementById("main");
   function $(id) { return document.getElementById(id); }
   function esc(s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); }
@@ -13,18 +13,33 @@
   function host(u) { return u.replace(/^https?:\/\/(www\.)?/, "").replace(/[?#].*$/, "").replace(/\/$/, ""); }
   function list(k) { return L[k] = L[k] || []; }
   function csv(v) { return v.split(",").map(function (s) { return s.trim(); }).filter(Boolean); }
-  function allTags() { var t = (L.tags || []).slice(); list("artists").concat(list("projects")).forEach(function (p) { (p.tags || []).forEach(function (x) { if (t.indexOf(x) < 0) t.push(x); }); }); return t; }
+  function allTags() { var c = {}; (L.tags || []).forEach(function (x) { c[x] = c[x] || 1; });
+    list("artists").concat(list("projects"), WORKS).forEach(function (p) { (p.tags || []).forEach(function (x) { c[x] = (c[x] || 0) + 1; }); });
+    return Object.keys(c).map(function (t) { return { t: t, n: c[t] }; }); }
+  /* works artists marked "on PLUG home" or "in shop" on their own sites */
+  function loadWorks() {
+    var people = list("artists").filter(function (a) { return a.slug && !a.url; });
+    return Promise.all(people.map(function (a) {
+      return fetch("a/" + encodeURIComponent(a.slug) + "/data/works.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) {
+        if (!d) return [];
+        return (d.works || []).filter(function (w) { return !w.hidden && (w.home || (w.shop && w.shop.on)); }).map(function (w) {
+          var base = "a/" + a.slug + "/", cov = String(w.cover || "").replace(/^video:/, "");
+          return { title: w.title, sub: a.name + (w.years ? " · " + w.years : ""), tags: w.tags || [], cover: cov ? (/^(https?:)?\/\//.test(cov) ? cov : base + cov) : "", href: base + "#p" + encodeURIComponent(w.id), home: !!w.home, shop: w.shop && w.shop.on ? w.shop : null, by: a.name };
+        });
+      }).catch(function () { return []; });
+    })).then(function (all) { WORKS = [].concat.apply([], all); });
+  }
 
   /* ---------- views ---------- */
   function card(p, i, kind) {
-    var internal = kind === "people" && p.slug && !p.url, href = internal ? "a/" + encodeURIComponent(p.slug) + "/" : safeUrl(p.url), name = p.name || p.title || "";
+    var internal = (kind === "people" && p.slug && !p.url) || !!p.href, href = p.href ? p.href : internal ? "a/" + encodeURIComponent(p.slug) + "/" : safeUrl(p.url), name = p.name || p.title || "";
     var pic = p.cover ? (isVid(p.cover) ? '<video src="' + esc(src(p.cover)) + '" autoplay muted loop playsinline></video>' : '<img loading="lazy" src="' + esc(src(p.cover)) + '" alt="" onerror="this.outerHTML=\'<span class=ball>\' + this.dataset.i + \'</span>\'" data-i="' + esc(name.trim().charAt(0).toUpperCase() || "+") + '">') : "";
-    var meta = '<span>[' + String(i + 1).padStart(2, "0") + "]</span><span>" + esc(kind === "people" ? (p.kind || "person") + (internal ? " · on plug" : "") : "project") + "</span>";
+    var meta = '<span>[' + String(i + 1).padStart(2, "0") + "]</span><span>" + esc(kind === "people" ? (p.kind || "person") + (internal ? " · on plug" : "") : kind === "shop" ? (p.shop && p.shop.price ? p.shop.price : "available") : p.by ? "work" : "project") + "</span>";
     var extra = (p.links || []).filter(function (l) { return safeUrl(l.url); }).map(function (l) { return '<a href="' + esc(safeUrl(l.url)) + '" target="_blank" rel="noopener">' + esc(l.label || host(l.url)) + " ↗</a>"; }).join("");
     var inner = '<span class="meta">' + meta + '</span><span class="pic">' + (pic || '<span class="ball">' + esc(name.trim().charAt(0).toUpperCase() || "+") + "</span>") + "</span>" +
       '<span><span class="t">' + esc(name) + "</span>" + ((p.line || p.sub) ? '<span class="l" style="display:block">' + esc(p.line || p.sub) + "</span>" : "") + "</span>" +
       '<span style="display:grid;gap:8px">' + ((p.tags || []).length ? '<span class="tg">' + p.tags.map(function (t) { return "<span>" + esc(t) + "</span>"; }).join("") + "</span>" : "") +
-      (href ? '<span class="go">' + (internal ? "open site →" : esc(host(href)) + " ↗") + "</span>" : "") + "</span>";
+      (kind === "shop" ? '<span class="go">' + esc([p.shop.edition, p.shop.price].filter(Boolean).join(" · ") || "available") + "</span>" + (safeUrl(p.shop.url) ? '<a class="buy" href="' + esc(safeUrl(p.shop.url)) + '" target="_blank" rel="noopener">buy / ask ↗</a>' : '<span class="go">payments soon</span>') : href ? '<span class="go">' + (internal ? "open →" : esc(host(href)) + " ↗") + "</span>" : "") + "</span>";
     if (!href) return '<div class="card">' + inner + (extra ? '<span class="extra">' + extra + "</span>" : "") + "</div>";
     return '<div class="card" style="position:relative">' + inner.replace('<span class="t">', '<a class="t" style="text-decoration:none" href="' + esc(href) + '"' + (internal ? "" : ' target="_blank" rel="noopener"') + '><span style="position:absolute;inset:0" aria-hidden="true"></span>').replace(esc(name) + "</span>", esc(name) + "</a>") +
       (extra ? '<span class="extra" style="position:relative;z-index:1">' + extra + "</span>" : "") + "</div>";
@@ -37,17 +52,17 @@
     var h = "";
     if (view === "about") { h = '<div class="about">' + esc(L.about) + "</div>"; $("filterline").innerHTML = ""; }
     else {
-      var items = list(view === "people" ? "artists" : "projects"), shown = items.filter(function (p) { return !tag || (p.tags || []).indexOf(tag) > -1; });
-      $("filterline").innerHTML = "<span>" + (view === "people" ? "people & collectives" : "projects") + "</span><span>showing <b>" + shown.length + "</b> of " + items.length + "</span>" +
+      var items = view === "people" ? list("artists") : view === "shop" ? WORKS.filter(function (w) { return w.shop; }) : list("projects").concat(WORKS.filter(function (w) { return w.home; })), shown = items.filter(function (p) { return !tag || (p.tags || []).indexOf(tag) > -1; });
+      $("filterline").innerHTML = "<span>" + ({ people: "people & collectives", projects: "projects", shop: "shop · editions, objects, clothes" })[view] + "</span><span>showing <b>" + shown.length + "</b> of " + items.length + "</span>" +
         (tag ? "<span>tag: <b>" + esc(tag) + '</b></span><button type="button" id="clear">clear</button>' : "<span>no tag filter</span>");
-      h = shown.length ? '<div class="grid">' + shown.map(function (p) { return card(p, items.indexOf(p), view); }).join("") + "</div>" : '<p class="empty">' + (items.length ? "nothing with this tag here" : "nothing here yet") + "</p>";
+      h = shown.length ? '<div class="grid">' + shown.map(function (p) { return card(p, items.indexOf(p), view); }).join("") + "</div>" : '<p class="empty">' + (items.length ? "nothing with this tag here" : view === "shop" ? "the shop is empty for now. Artists add works here with “in shop” in their own editor." : "nothing here yet") + "</p>";
     }
     if (edit) h += editor();
     main.innerHTML = h; status();
-    $("foot").innerHTML = "<span>" + esc(L.title) + " / " + esc(L.by || "") + "</span><span>" + list("artists").length + " people & collectives · " + list("projects").length + " projects</span>";
+    $("foot").innerHTML = "<span>" + esc(L.title) + " / " + esc(L.by || "") + "</span><span>" + list("artists").length + " people & collectives · " + (list("projects").length + WORKS.filter(function (w) { return w.home; }).length) + " projects · " + WORKS.filter(function (w) { return w.shop; }).length + " in shop</span>";
     var cl = $("clear"); if (cl) cl.onclick = function () { setTag(null); };
   }
-  function setTag(t) { tag = tag === t ? null : t; if (pit) pit.setActive(tag); if (view === "about") { view = "people"; history.replaceState(null, "", "#people"); } render(); }
+  function setTag(t) { tag = tag === t ? null : t; if (pit) pit.setActive(tag); if (view === "about") { view = "projects"; history.replaceState(null, "", "#projects"); } render(); }
 
   /* ---------- editor ---------- */
   function thumb(p) { return p.cover ? (isVid(p.cover) ? '<video class="thumb" src="' + esc(src(p.cover)) + '" muted></video>' : '<img class="thumb" src="' + esc(src(p.cover)) + '" alt="" onerror="this.style.visibility=\'hidden\'">') : '<span class="thumb"></span>'; }
@@ -69,8 +84,10 @@
       });
       h += '<h2>add someone</h2><div class="row" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto"><label class="fld">name<input id="n-name" placeholder="name or collective"></label>' +
         '<label class="fld">link to their own site (empty = make a site here on plug)<input id="n-url" placeholder="https://"></label><div class="btns" style="align-self:end"><button type="button" class="btn" id="n-add">+ add</button></div></div>';
+    } else if (view === "shop") {
+      h += "<h2>shop</h2><p class=\"muted\" style=\"margin:0;font-size:13px\">Artists put works here themselves: in their own site’s editor, open a work and tick “in shop”, then set price, edition and a buy link. Payments come later.</p>";
     } else {
-      h += "<h2>projects · " + list("projects").length + "</h2>";
+      h += "<h2>collective projects · " + list("projects").length + "</h2>";
       L.projects.forEach(function (p, i) {
         h += '<div class="row" data-k="projects" data-i="' + i + '">' + thumb(p) +
           '<div class="stack"><label class="fld">title<input data-p="title" value="' + esc(p.title) + '"></label><label class="fld">subtitle<input data-p="sub" value="' + esc(p.sub) + '"></label></div>' +
@@ -132,12 +149,13 @@
     if (edit) { if (dirty() && !this.dataset.sure) { this.dataset.sure = 1; this.textContent = "unsaved · logout?"; return; } delete this.dataset.sure; edit = false; GH.setToken(""); render(); toast("logged out on this browser"); return; }
     GH.ensure().then(function (ok) { if (!ok) return; GH.getText("artists.json").then(function (t) { if (!dirty()) { L = JSON.parse(t); saved = JSON.stringify(L); retag(); } }).catch(function () {}).then(function () { edit = true; render(); }); });
   };
-  function route() { var v = (location.hash || "").slice(1); view = ["projects", "people", "about"].indexOf(v) > -1 ? v : "people"; if (L) render(); }
+  function route() { var v = (location.hash || "").slice(1); view = ["projects", "people", "shop", "about"].indexOf(v) > -1 ? v : "projects"; if (L) render(); }
   window.addEventListener("hashchange", route);
   window.addEventListener("beforeunload", function (e) { if (edit && dirty()) { e.preventDefault(); e.returnValue = ""; } });
   route();
   fetch("artists.json?t=" + Date.now(), { cache: "no-store" }).then(function (r) { return r.json(); }).then(function (d) {
     L = d; list("artists"); list("projects"); saved = JSON.stringify(L); render();
     pit = window.Pit.start($("pit"), $("balls"), $("pills"), allTags(), setTag);
+    loadWorks().then(function () { render(); retag(); });
   }).catch(function () { main.innerHTML = '<p class="empty">The index didn\'t load. Reload the page to try again.</p>'; });
 })();

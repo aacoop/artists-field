@@ -157,3 +157,6 @@ button, input, textarea, select { font: inherit; color: inherit; }
 .ghbox input { background: var(--field); border: 1px solid var(--line); padding: 6px 8px; color: var(--ink); }
 .gherr { color: var(--danger); }
 .ghbtns { display: flex; justify-content: flex-end; gap: 6px; }
+
+.pub { display: grid; gap: 6px; border: 1px solid var(--line); padding: 8px; }
+.pub .chk { display: flex; gap: 6px; align-items: center; font-size: 12px; color: var(--ink); }

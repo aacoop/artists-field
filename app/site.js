@@ -154,6 +154,8 @@ function renderFacts(w) {
     '<div class="row2"><label>year<input id="f-years" value="' + esc(w.years) + '"></label><label>provenance<select id="f-prov">' + Object.keys(PROV).map(function (p) { return '<option value="' + p + '"' + (w.prov === p ? " selected" : "") + ">" + PROV[p] + "</option>"; }).join("") + "</select></label></div>" +
     '<label>tags, comma separated<input id="f-tags" value="' + esc((w.tags || []).join(", ")) + '"></label>' +
     '<label>details, one “key: value” per line<textarea id="f-spec">' + esc((w.spec || []).map(function (r) { return r[0] + ": " + r[1]; }).join("\n")) + "</textarea></label>" +
+    '<div class="pub"><span class="k">where it shows</span><label class="chk"><input type="checkbox" id="f-home"' + (w.home ? " checked" : "") + '> on the PLUG home page</label><label class="chk"><input type="checkbox" id="f-shop"' + (w.shop && w.shop.on ? " checked" : "") + '> in the shop</label>' +
+    (w.shop && w.shop.on ? '<div class="row2"><label>price<input id="s-price" value="' + esc(w.shop.price) + '" placeholder="e.g. 120 USD"></label><label>edition / sizes<input id="s-ed" value="' + esc(w.shop.edition) + '" placeholder="e.g. edition of 30"></label></div><label>buy or contact link (until payments are set up)<input id="s-url" value="' + esc(w.shop.url) + '" placeholder="https:// or a telegram / instagram link"></label>' : "") + "</div>" +
     '<div><span class="k">cover</span><div style="display:flex;gap:8px;align-items:center">' + (w.cover ? '<span style="width:56px">' + mediaTag(w.cover, "cover", false) + "</span>" : '<span class="hint">none</span>') + '<button type="button" class="btn" id="f-coverup">upload cover (GIF ok)</button></div></div>' +
     '<div style="display:flex;gap:6px;flex-wrap:wrap"><button type="button" class="btn" id="add-text">+ text</button><button type="button" class="btn" id="add-media">+ image / GIF / video</button><button type="button" class="btn" id="scatter">scatter</button></div>' +
     '<div><span class="k">layers, top first</span><div class="layers">' + (layers || '<span class="hint">no blocks yet</span>') + "</div></div>" + selForm +
@@ -168,6 +170,11 @@ function wireFacts(w) {
   bind("f-prov", function () { w.prov = this.value; status(); }, "onchange");
   bind("f-tags", function () { w.tags = this.value.split(",").map(function (s) { return s.trim(); }).filter(Boolean); G = null; status(); });
   bind("f-spec", function () { w.spec = this.value.split("\n").map(function (l) { var i = l.indexOf(":"); return i > 0 ? [l.slice(0, i).trim(), l.slice(i + 1).trim()] : null; }).filter(Boolean); status(); });
+  bind("f-home", function () { if (this.checked) w.home = true; else delete w.home; status(); }, "onchange");
+  bind("f-shop", function () { w.shop = w.shop || {}; w.shop.on = this.checked; if (!this.checked && !w.shop.price && !w.shop.url && !w.shop.edition) delete w.shop; status(); renderFacts(w); }, "onchange");
+  bind("s-price", function () { w.shop.price = this.value; status(); });
+  bind("s-ed", function () { w.shop.edition = this.value; status(); });
+  bind("s-url", function () { w.shop.url = this.value.trim(); status(); });
   bind("f-coverup", function () { pick(false, function (srcs) { if (srcs[0]) { w.cover = srcs[0]; status(); renderFacts(w); } }); }, "onclick");
   bind("add-text", function () { var b = { id: uid(), type: "text", text: "new text", x: 10, y: canvasBottom() + 2, w: 30, z: topZ(w) + 1, rot: 0, fs: 1.5, style: "note" }; w.blocks.push(b); S.sel = b.id; status(); render(); }, "onclick");
   bind("add-media", function () { pick(true, function (srcs) { addMedia(w, srcs); }); }, "onclick");

@@ -94,3 +94,6 @@ body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-a
 .gherr { color: var(--danger); }
 .ghbtns { display: flex; justify-content: flex-end; gap: 6px; }
 .toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: max(16px, env(safe-area-inset-bottom, 0px)); background: #111; color: #fff; padding: 6px 12px; font-size: 13px; z-index: 50; }
+
+.card .buy { justify-self: start; background: var(--ink); color: #fff; text-decoration: none; padding: 4px 10px; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .06em; position: relative; z-index: 1; }
+.card .buy:hover { background: var(--lime); color: var(--ink); }
