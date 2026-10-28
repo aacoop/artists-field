@@ -266,7 +266,7 @@ function status() { var s = document.getElementById("st"), b = document.getEleme
 function renderBar() {
   bar.hidden = false;
   bar.innerHTML = '<button type="button" class="btn' + (S.edit ? " primary" : "") + '" id="toggle">' + (S.edit ? "done editing" : "edit") + "</button>" +
-    (S.edit ? '<button type="button" class="btn" id="neww">+ new work</button><button type="button" class="btn primary" id="save">save</button><span class="status" id="st"></span>' : '<a class="hint" href="../../" style="margin-left:auto">aacoop ++</a>');
+    (S.edit ? '<button type="button" class="btn" id="neww">+ new work</button><button type="button" class="btn primary" id="save">save</button><span class="status" id="st"></span>' : '<a class="hint" href="../../" style="margin-left:auto">plug</a>');
   document.getElementById("toggle").onclick = function () {
     if (S.edit) { if (dirty() && !confirmLeave()) return; S.edit = false; G = null; S.sel = null; ACT = null; wall.ondragover = wall.ondragenter = wall.ondragleave = wall.ondrop = null; render(); return; }
     GH.ensure().then(function (ok) { if (!ok) return; refresh().then(function () { S.edit = true; G = null; S.sel = null; render(); }); });

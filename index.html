@@ -3,23 +3,31 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>aacoop ++</title>
+<title>PLUG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;700&family=Instrument+Serif:ital@1&family=JetBrains+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="app/home.css">
 </head>
 <body>
-<header class="hd">
-  <h1 class="logo">aacoop <span>++</span></h1>
-  <nav class="orbs" id="orbs" aria-label="sections">
-    <a class="orb" href="#projects" data-v="projects"><span>projects</span></a>
-    <a class="orb" href="#people" data-v="people"><span>people</span></a>
-    <a class="orb" href="#about" data-v="about"><span>about</span></a>
-    <button type="button" class="orb ring" id="login"><span>login</span></button>
+<header class="bar">
+  <a class="brand" href="#"><i aria-hidden="true"></i><b id="b-title">PLUG</b> / <span id="b-by">aacoop ++</span><span class="sub">public network index</span></a>
+  <nav class="tabs" aria-label="sections">
+    <a href="#people" data-v="people">people</a><a href="#projects" data-v="projects">projects</a><a href="#about" data-v="about">about</a>
   </nav>
+  <button type="button" class="login" id="login">login</button>
 </header>
+<section class="hero" aria-label="tags">
+  <div class="hero-text"><p class="eyebrow" id="eyebrow"></p><h1 class="hl"><span id="hl1"></span><em id="hl2"></em></h1></div>
+  <div class="pit" id="pit"><canvas id="balls" aria-hidden="true"></canvas><div class="pills" id="pills" role="group" aria-label="filter by field"></div>
+    <p class="pit-hint">click a tag to filter · drag to throw</p></div>
+</section>
+<div class="filterline" id="filterline"></div>
 <main id="main" class="main"><p class="muted">loading…</p></main>
+<footer class="foot" id="foot"></footer>
 <div class="toast" id="toast" hidden role="status"></div>
 <script src="app/config.js"></script>
 <script src="app/gh.js"></script>
+<script src="app/pit.js"></script>
 <script src="app/home.js"></script>
 </body>
 </html>

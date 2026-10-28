@@ -1,9 +1,19 @@
 {
- "title": "aacoop ++",
- "about": "aacoop is a cooperative of artists, architects, programmers and 3D people. We share tools, spaces and projects.",
- "tags": ["3D", "architecture", "art posts", "code", "art", "collectives"],
+ "title": "PLUG",
+ "by": "aacoop ++",
+ "eyebrow": "networked art index // 2026",
+ "headline": "A field to explore,",
+ "headline2": "not a menu to follow.",
+ "about": "PLUG is the public index of aacoop ++, a cooperative of artists, architects, programmers, 3D people and collectives. Each card leads to someone's own site: made here on PLUG, or anywhere else on the internet.",
+ "tags": ["3D", "architecture", "art posts", "code", "art", "collectives", "set design", "spatial design", "installation"],
  "artists": [
-  { "slug": "alexandra-konstantinovna", "name": "alexandra konstantinovna", "line": "imaginary engineering: VR, glass, steel, ceramics, set design", "cover": "a/alexandra-konstantinovna/img/01/01.jpg", "tags": ["art", "3D", "code"] }
+  { "slug": "alexandra-konstantinovna", "name": "alexandra konstantinovna", "kind": "person", "line": "imaginary engineering: VR, glass, steel, ceramics, set design", "cover": "a/alexandra-konstantinovna/img/01/01.jpg", "tags": ["art", "3D", "code", "set design"], "links": [{ "label": "behance", "url": "https://www.behance.net/ab03030303" }] },
+  { "name": "GESAMT", "kind": "collective", "line": "art direction, installation and production design: sets, stages, exhibition spaces, custom objects", "url": "https://gesamtproduction.com", "cover": "https://static.tildacdn.com/tild3132-3834-4161-a637-343835306464/photo_2022-07-08_104.jpeg", "tags": ["collectives", "set design", "installation", "architecture"] },
+  { "name": "LOT2", "kind": "collective", "line": "Paris-based practice: spatial design, stage, installation", "url": "https://youngfulu.github.io/LOT2/", "cover": "", "tags": ["collectives", "spatial design", "installation"] },
+  { "name": "Al_lntv", "kind": "person", "line": "colleague no. 1 · write a line about the work", "url": "https://gorgeous-zucchini-862.notion.site/Al_lntv-d26c16a04921463186228c2c6e2a5966", "cover": "", "tags": ["art"] },
+  { "name": "readymag portfolio", "kind": "person", "line": "name and line to fill in", "url": "https://readymag.website/u3308716028/4337078/", "cover": "", "tags": [] }
  ],
- "projects": []
+ "projects": [
+  { "title": "Sets Designs", "sub": "set design, by alexandra konstantinovna", "url": "https://www.behance.net/gallery/256131495/Sets-Designs", "cover": "a/alexandra-konstantinovna/img/14/02.jpg", "tags": ["set design"] }
+ ]
 }
