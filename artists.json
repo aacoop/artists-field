@@ -1,0 +1,7 @@
+{
+ "title": "artists field",
+ "about": "A shared list of artists. Each one keeps their own site here and edits it in the browser.",
+ "artists": [
+  { "slug": "alexandra-konstantinovna", "name": "alexandra konstantinovna", "line": "imaginary engineering: VR, glass, steel, ceramics, set design", "cover": "a/alexandra-konstantinovna/img/01/01.jpg" }
+ ]
+}
